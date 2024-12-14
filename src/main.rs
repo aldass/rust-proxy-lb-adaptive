@@ -1,47 +1,35 @@
+use rust_proxy_lb_adaptive::start_proxy;
+use std::env;
 use std::net::SocketAddr;
-use tokio::io::{AsyncReadExt, AsyncWriteExt};
-use tokio::net::{TcpListener, TcpStream};
-
-async fn handle_client(
-    mut inbound: TcpStream,
-    proxy_addr: SocketAddr,
-) -> Result<(), Box<dyn std::error::Error>> {
-    let mut outbound = TcpStream::connect(proxy_addr).await?;
-
-    let (mut ri, mut wi) = inbound.split();
-    let (mut ro, mut wo) = outbound.split();
-
-    let client_to_server = async {
-        tokio::io::copy(&mut ri, &mut wo).await?;
-        wo.shutdown().await
-    };
-
-    let server_to_client = async {
-        tokio::io::copy(&mut ro, &mut wi).await?;
-        wi.shutdown().await
-    };
-
-    tokio::try_join!(client_to_server, server_to_client)?;
-
-    Ok(())
-}
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let listen_addr = "127.0.0.1:8080".parse::<SocketAddr>()?;
-    let proxy_addr = "127.0.0.1:8081".parse::<SocketAddr>()?;
+    let listen_addr = "0.0.0.0:8088".parse::<SocketAddr>()?;
 
-    let listener = TcpListener::bind(listen_addr).await?;
-    println!("Listening on: {}", listen_addr);
+    // TODO: Use a more robust dynamic configuration system
+    let backend1_addr = env::var("BACKEND1_ADDR")?;
+    let backend2_addr = env::var("BACKEND2_ADDR")?;
+    let backend3_addr = env::var("BACKEND3_ADDR")?;
 
-    loop {
-        let (socket, _) = listener.accept().await?;
-        let proxy_addr = proxy_addr.clone();
+    println!(
+        "Backend addresses: {}, {}, {}",
+        backend1_addr, backend2_addr, backend3_addr
+    );
 
-        tokio::spawn(async move {
-            if let Err(e) = handle_client(socket, proxy_addr).await {
-                eprintln!("Error handling client: {}", e);
-            }
-        });
-    }
+    let backend_addrs = vec![
+        backend1_addr.parse::<SocketAddr>().map_err(|e| {
+            eprintln!("Failed to parse BACKEND1_ADDR: {}", e);
+            e
+        })?,
+        backend2_addr.parse::<SocketAddr>().map_err(|e| {
+            eprintln!("Failed to parse BACKEND2_ADDR: {}", e);
+            e
+        })?,
+        backend3_addr.parse::<SocketAddr>().map_err(|e| {
+            eprintln!("Failed to parse BACKEND3_ADDR: {}", e);
+            e
+        })?,
+    ];
+
+    start_proxy(listen_addr, backend_addrs).await
 }
