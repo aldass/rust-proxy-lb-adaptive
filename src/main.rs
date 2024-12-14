@@ -12,7 +12,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let backend3_addr = env::var("BACKEND3_ADDR")?;
 
     println!(
-        "Backend addresses: {}, {}, {}",
+        "Backend server addresses: {}, {}, {}",
         backend1_addr, backend2_addr, backend3_addr
     );
 
