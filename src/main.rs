@@ -1,5 +1,5 @@
 use std::net::SocketAddr;
-use tokio::io::AsyncWriteExt;
+use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::net::{TcpListener, TcpStream};
 
 async fn handle_client(
@@ -28,8 +28,8 @@ async fn handle_client(
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let listen_addr = "127.0.0.1:8085".parse::<SocketAddr>()?;
-    let proxy_addr = "127.0.0.1:8086".parse::<SocketAddr>()?;
+    let listen_addr = "127.0.0.1:8080".parse::<SocketAddr>()?;
+    let proxy_addr = "127.0.0.1:8081".parse::<SocketAddr>()?;
 
     let listener = TcpListener::bind(listen_addr).await?;
     println!("Listening on: {}", listen_addr);
