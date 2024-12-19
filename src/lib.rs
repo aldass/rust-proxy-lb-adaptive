@@ -46,6 +46,7 @@ pub async fn start_proxy(
             let proxy_addr = {
                 let mut backends = backends.lock().await;
                 let addr = backends.pop_front().unwrap();
+                println!("Proxying to: {}", addr);
                 backends.push_back(addr);
                 addr
             };

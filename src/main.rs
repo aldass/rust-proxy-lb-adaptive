@@ -4,7 +4,7 @@ use std::net::SocketAddr;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let listen_addr = "0.0.0.0:8080".parse::<SocketAddr>()?;
+    let listen_addr = "0.0.0.0:8088".parse::<SocketAddr>()?;
 
     // TODO: Use a more robust dynamic configuration system
     let backend1_addr = env::var("BACKEND1_ADDR")?;

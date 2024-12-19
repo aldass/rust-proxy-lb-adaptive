@@ -4,7 +4,7 @@ services:
       - bridge-net
     build: .
     ports:
-      - "8080:8080"
+      - "8088:8088"
     depends_on:
       - backend1
       - backend2
@@ -16,8 +16,14 @@ services:
     networks:
       - bridge-net
     image: alpine
-    command: >
-      sh -c "while true; do echo -e 'HTTP/1.1 200 OK\r\n\r\nBackend 1' | nc -l -p 8081; done"
+    command:
+      - sh
+      - -c
+      - |
+        export IP_ADDR=`hostname -i`
+        while true; do
+          echo -e "HTTP/1.1 200 OK\r\n\r\nBackend 1 - IP: $IP_ADDR" | nc -l -p 8081
+        done
     ports:
       - "8081:8081"
 
@@ -25,8 +31,14 @@ services:
     networks:
       - bridge-net
     image: alpine
-    command: >
-      sh -c "while true; do echo -e 'HTTP/1.1 200 OK\r\n\r\nBackend 1' | nc -l -p 8081; done"
+    command:
+      - sh
+      - -c
+      - |
+        export IP_ADDR=`hostname -i`
+        while true; do
+          echo -e "HTTP/1.1 200 OK\r\n\r\nBackend 2 - IP: $IP_ADDR" | nc -l -p 8082
+        done
     ports:
       - "8082:8082"
 
@@ -34,8 +46,14 @@ services:
     networks:
       - bridge-net
     image: alpine
-    command: >
-      sh -c "while true; do echo -e 'HTTP/1.1 200 OK\r\n\r\nBackend 1' | nc -l -p 8081; done"
+    command:
+      - sh
+      - -c
+      - |
+        export IP_ADDR=`hostname -i`
+        while true; do
+          echo -e "HTTP/1.1 200 OK\r\n\r\nBackend 3 - IP: $IP_ADDR" | nc -l -p 8083
+        done
     ports:
       - "8083:8083"
 
